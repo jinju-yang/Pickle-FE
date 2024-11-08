@@ -26,7 +26,7 @@ const questions = [
   {
     Qnum: 2,
     question: "어떤 형태의 작품을 원하시나요?",
-    choices: ["상관 없음", "영화", "드라마", "노래", "책"],
+    choices: ["상관 없음", "책", "음악", "영화", "시리즈"],
     isSingleChoice: false,
   },
   {
