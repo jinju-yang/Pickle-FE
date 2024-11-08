@@ -11,16 +11,30 @@ export const LogInPage = () => {
   const [loginId, setLoginId] = useState("");
   const [password, setPassword] = useState("");
 
-  const handleLogin = () => {
-    // Construct the request body for login
-    const requestBody = {
-      loginId,
-      password,
-    };
+  // Example login function
+  const handleLogin = async (credentials) => {
+    try {
+      const response = await fetch("/auth/log-in", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(credentials),
+      });
 
-    // Log request body to the console (simulating the login request)
-    console.log("Request Body:", requestBody);
-    navigate("/main");
+      if (!response.ok) throw new Error("Login failed");
+
+      const data = await response.json();
+      const accessToken = data.accessToken; // Assuming your backend returns { accessToken: "your_token" }
+
+      // Store the token in localStorage
+      localStorage.setItem("accessToken", accessToken);
+
+      // Redirect to another page or update UI as needed
+      navigate("/main"); // Example: navigate to the main page
+    } catch (error) {
+      console.error("Error during login:", error);
+    }
   };
 
   return (

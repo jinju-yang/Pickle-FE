@@ -10,35 +10,34 @@ import Search from "../components/Search";
 const MainPage = () => {
   const navigate = useNavigate();
   const [sideBar, setSideBar] = useState(false);
-  const [galleryData, setGalleryData] = useState([]);
+  const [galleryData, setGalleryData] = useState([]); // State for gallery data
+  const [loading, setLoading] = useState(true);
 
   const handleSideBar = () => {
     setSideBar(!sideBar);
   };
 
-  // Fetch gallery data from the backend with accessToken
+  // Fetch gallery data from the backend when the component mounts
   useEffect(() => {
     const fetchGalleryData = async () => {
       try {
-        // Retrieve accessToken from localStorage (or wherever it's stored)
-        const accessToken = localStorage.getItem("accessToken");
-
-        const response = await fetch("your_backend_url", {
+        const response = await fetch("/lets-pickle", {
           method: "GET",
           headers: {
             "Content-Type": "application/json",
-            Authorization: `Bearer ${accessToken}`, // Add the accessToken to the request
+            // If you need authentication, add the Authorization header
+            // Authorization: `Bearer ${localStorage.getItem("accessToken")}`
           },
         });
 
-        if (!response.ok) {
-          throw new Error("Failed to fetch data");
-        }
+        if (!response.ok) throw new Error("Failed to fetch gallery data.");
 
         const data = await response.json();
-        setGalleryData(data);
+        setGalleryData(data); // Store fetched data in state
       } catch (error) {
         console.error("Error fetching gallery data:", error);
+      } finally {
+        setLoading(false); // Stop loading indicator
       }
     };
 
@@ -66,15 +65,22 @@ const MainPage = () => {
 
       {/* Render the gallery items */}
       <GalleryContainer>
-        {galleryData.map((item, index) => (
-          <GalleryItem key={index}>
-            <img src={item.img} alt={item.title} />
-            <h3>{item.title}</h3>
-            <p>Liked: {item.liked ? "Yes" : "No"}</p>
-            <p>Watched: {item.watched ? "Yes" : "No"}</p>
-            <p>Memoed: {item.memoed ? "Yes" : "No"}</p>
-          </GalleryItem>
-        ))}
+        {loading ? (
+          <p>Loading...</p>
+        ) : (
+          galleryData.map((item, index) => (
+            <GalleryItem key={item.contentId}>
+              <img src={item.img} alt={item.title} />
+              <h3>{item.title}</h3>
+              <p>Released: {item.releasedAt}</p>
+              <p>Category: {item.category}</p>
+              <p>Author: {item.author}</p>
+              <p>Description: {item.description}</p>
+              <p>Genre: {item.genre}</p>
+              <p>Emotion: {item.emotion}</p>
+            </GalleryItem>
+          ))
+        )}
       </GalleryContainer>
     </div>
   );

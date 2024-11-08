@@ -9,49 +9,12 @@ import LOGO from "../assets/logo3.svg";
 import { InitialPages } from "./InitialPage";
 
 const questions = [
-  {
-    Qnum: 1,
-    question: "어떤 분위기의 작품을 원하시나요?",
-    choices: [
-      "상관 없음",
-      "웃긴",
-      "감동적인",
-      "무서운",
-      "눈물 나는",
-      "긴박한",
-      "차분한",
-    ],
-    isSingleChoice: false,
-  },
-  {
-    Qnum: 2,
-    question: "어떤 형태의 작품을 원하시나요?",
-    choices: ["상관 없음", "책", "음악", "영화", "시리즈"],
-    isSingleChoice: false,
-  },
-  {
-    Qnum: 3,
-    question: "혼자인가요? 함께인가요?",
-    choices: ["상관 없음", "1인", "2인", "3인 이상"],
-    isSingleChoice: false,
-  },
-  {
-    Qnum: 4,
-    question: "지금 시간이 얼마나 있나요?",
-    choices: [
-      "상관 없음",
-      "30분 이하",
-      "30분 ~ 1시간",
-      "1시간 ~ 2시간",
-      "2시간 이상",
-    ],
-    isSingleChoice: true, // Mark as single choice
-  },
+  // ... your question objects
 ];
 
 const PickPage = () => {
   const navigate = useNavigate();
-  const { setResult } = useResult(); // Access setResult from context
+  const { setResult } = useResult();
   const [selectedChoices, setSelectedChoices] = useState({});
   const [hiddenChoices, setHiddenChoices] = useState({});
 
@@ -79,11 +42,17 @@ const PickPage = () => {
     const selectedChoicesJson = JSON.stringify(cleanedChoices, null, 2);
 
     try {
-      navigate("/result");
+      const accessToken = localStorage.getItem("accessToken"); // Retrieve token if available
 
-      const response = await fetch("your_backend_url", {
+      // Configure headers with accessToken if the user is logged in
+      const headers = {
+        "Content-Type": "application/json",
+        ...(accessToken ? { Authorization: `Bearer ${accessToken}` } : {}), // Add Authorization header if logged in
+      };
+
+      const response = await fetch("lets-pickle", {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
+        headers,
         body: selectedChoicesJson,
       });
 

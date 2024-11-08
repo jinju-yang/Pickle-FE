@@ -7,7 +7,7 @@ import styled from "styled-components";
 import ContentIcons from "../components/ContentIcons";
 import YellowButton from "../components/YellowButton";
 import MemoInput from "../components/MemoInput";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 
 const content = {
   img: poster,
@@ -15,7 +15,7 @@ const content = {
   category: "영화",
   author: "조선호",
   description:
-    "‘용준’(홍경).엄마의 등쌀에 떠밀려 억지로 도시락 배달 알바를 간 ‘용준’은 완벽한 이상형 ‘여름’(노윤서)과 마주친다.부끄러움은 뒷전, 첫눈에 반한 ‘여름’에게 ‘용준’은 서툴지만 솔직하게 다가가고 여름의 동생 ‘가을’(김민주)은 용준의 용기를 응원한다. 손으로 말하는 ‘여름’과 더 가까워지기 위해 더 잘 듣기보단 더 잘 보고 느끼려 노력하지만, 마침내 가까워졌다 생각하던 찰나 ‘여름’은 왜인지 자꾸 ‘용준’과 멀어지려 하는데…",
+    "‘용준’(홍경).엄마의 등쌀에 떠밀려 억지로 도시락 배달 알바를 간 ‘용준’은...",
   genre: "로맨스, 드라마",
   emotion: "설렘, 기쁨",
 };
@@ -25,27 +25,38 @@ const comments = [
     memberName: "카리나",
     memo: "sample",
   },
-  {
-    memberName: "카리나",
-    memo: "sample",
-  },
-  {
-    memberName: "카리나",
-    memo: "sample",
-  },
-  {
-    memberName: "카리나",
-    memo: "sample",
-  },
+  // ... other comments
 ];
-
-const commentOfMine = {
-  memo: "",
-};
 
 const DetailPage = () => {
   const [memoInput, setMemoInput] = useState(false);
   const [commentOfMine, setCommentOfMine] = useState({ memo: "" });
+
+  // Function to fetch my memo from the backend
+  const fetchMyMemo = async () => {
+    try {
+      const accessToken = localStorage.getItem("accessToken"); // Retrieve token from localStorage
+      const response = await fetch("/pickle/memo?contentId=1", {
+        method: "GET",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${accessToken}`, // Add accessToken in headers
+        },
+      });
+
+      if (!response.ok) throw new Error("Failed to fetch my memo.");
+
+      const data = await response.json();
+      setCommentOfMine({ memo: data.myMemo }); // Update commentOfMine with myMemo
+    } catch (error) {
+      console.error("Error fetching my memo:", error);
+    }
+  };
+
+  // Call fetchMyMemo when the component mounts
+  useEffect(() => {
+    fetchMyMemo();
+  }, []);
 
   const handleInputButton = () => {
     setMemoInput(true);
@@ -119,6 +130,7 @@ const DetailPage = () => {
 
 export default DetailPage;
 
+// Styled components
 const ContentContainer = styled.div`
   display: flex;
   align-items: center;
