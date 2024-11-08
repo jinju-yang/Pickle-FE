@@ -58,8 +58,16 @@ const SignUpPage = () => {
             setSignUpSuccess("회원가입에 성공했습니다!");
             console.log("회원가입 성공:", requestBody);
           } else {
-            return response.json().then((data) => {
-              throw new Error(data.message || "회원가입에 실패했습니다.");
+            // Attempt to parse error JSON, handle empty or invalid JSON response
+            return response.text().then((text) => {
+              let errorMessage = "회원가입에 실패했습니다.";
+              try {
+                const data = JSON.parse(text);
+                errorMessage = data.message || errorMessage;
+              } catch {
+                console.warn("Invalid JSON response:", text);
+              }
+              throw new Error(errorMessage);
             });
           }
         })
